@@ -1,0 +1,17 @@
+#cloud-config
+
+write_files:
+  - path: /opt/locust/locustfile.py
+    content: |
+      from locust import HttpUser, task
+      class HelloWorldUser(HttpUser):
+          @task
+          def hello_world(self):
+              self.client.get("/")
+    permissions: '0644'
+
+runcmd:
+  - python -m pip install --upgrade pip
+  - python -m pip install locust
+  - systemctl stop firewalld
+  - nohup /usr/local/bin/locust -f /opt/locust/locustfile.py > /opt/locust/locust.log 2>&1 &
